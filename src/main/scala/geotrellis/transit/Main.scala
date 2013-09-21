@@ -48,10 +48,6 @@ object Main {
           () => buildGraph(configPath)
         case "server" =>
           inContext(() => mainServer(args))
-        case "info" =>
-          inContext(() => graphInfo())
-        case "debug" =>
-          inContext(() => debug())
         case s =>
           Logger.error(s"Unknown subcommand $s")
           System.exit(1)
@@ -73,42 +69,5 @@ object Main {
                                "/*",
                                java.util.EnumSet.noneOf(classOf[javax.servlet.DispatcherType]))
     }
-  }
-
-  def graphInfo() = {
-    val graph = _context.graph
-    var totalEdgeCount = 0
-    Logger.log(s"Graph Info:")
-    for(mode <- graph.anytimeEdgeSets.keys) {
-      val ec = graph.anytimeEdgeSets(mode).edgeCount
-      totalEdgeCount += ec
-      Logger.log(s"  $mode Edge Count: ${ec}")
-    }
-    for(mode <- graph.scheduledEdgeSets.keys) {
-      val ec = graph.scheduledEdgeSets(mode).edgeCount
-      totalEdgeCount += ec
-      Logger.log(s"  $mode Edge Count: ${ec}")
-    }
-
-    Logger.log(s"  Total Edge Count: ${totalEdgeCount}")
-    Logger.log(s"  Vertex Count: ${graph.vertexCount}")
-  }
-
-  def debug() = {
-    val graph = _context.graph
-    val vc = graph.vertexCount
-
-    Logger.log("Finding suspicious walk edges...")
-    for(i <- 0 until vc) {
-      val sv = graph.vertexFor(i)
-      graph.getEdgeIterator(Walking,EdgeDirection.Incoming).foreachEdge(i,Time.ANY.toInt) { (t,w) =>
-        val tv = graph.vertexFor(t)
-        val d = Distance.distance(sv.location,tv.location)
-        if(d > 2000) {
-          println(s"$sv  ->  $tv is $d meters.")
-        }
-      }
-    }
-    Logger.log("Done.")
   }
 }

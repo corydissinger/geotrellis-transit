@@ -8,6 +8,8 @@ TAGS
 \#*#
 *~
 .#*
+.~*
 .lib
 *.aux.xml
 *.pyc
+*#
