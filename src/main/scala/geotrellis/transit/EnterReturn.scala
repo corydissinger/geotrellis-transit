@@ -36,7 +36,6 @@ case class Resource(category:Category,
        "address" : "$address",
        "zipCode" : "$zipCode",
        "emails"  : [ $e ],
-       "description" : "$description",
        "lat" : $lat,
        "lng" : $lng
      }
