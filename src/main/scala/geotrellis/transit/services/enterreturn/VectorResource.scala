@@ -46,12 +46,12 @@ trait VectorResource extends ServiceUtil{
     @QueryParam("time") 
     time: Int,
     
-    @ApiParam(value="Comma seperated list of durations, in seconds, to get polygons for.", 
+    @ApiParam(value="Maximum duration of trip, in seconds", 
               required=true, 
               defaultValue="1800")
     @DefaultValue("1800")
-    @QueryParam("durations")
-    durationsString: String,
+    @QueryParam("duration")
+    duration: Int,
 
     @ApiParam(value="""
 Modes of transportation. Must be one of the modes returned from /transitmodes, case insensitive.
@@ -90,15 +90,36 @@ Modes of transportation. Must be one of the modes returned from /transitmodes, c
     @QueryParam("rows") 
     rows: Int,
 
-    @ApiParam(value="Tolerance value for vector simplification.",
-              required=false,
-              defaultValue="0.0001")
-    @DefaultValue("0.0001")
-    @QueryParam("tolerance") 
-    tolerance:Double): Response = {
-
-    val durations = durationsString.split(",").map(_.toInt)
-    val maxDuration = durations.foldLeft(0)(math.max(_,_))
+    @ApiParam(value="Categories. In comma seperated, 'root|subcategory,rootsubcategory' form",
+              required=true,
+              defaultValue="all")
+    @DefaultValue("all")
+    @QueryParam("categories") 
+    categoriesString: String
+  ): Response = {
+    val categories:List[Category] =
+      if(categoriesString == "all") {
+        Main.enterReturn.categories
+      } else {
+        categoriesString
+                  .split(",")
+                  .map { pair =>
+                     val cats = 
+                       pair.split("|")
+                     if(cats.length != 2) {
+                       return ERROR("Categories must be comma separated list of category|subcategory.")
+                     } else {
+                       Main.enterReturn.categories.find { c => 
+                         c.root == cats(0) && c.name == cats(1)
+                       } match {
+                         case Some(cat) => cat
+                         case None => 
+                           return ERROR(s"Unknown category ${cats(0)}|${cats(1)}")
+                       }
+                     }
+                   }
+                  .toList
+      }
 
     val request = 
       try{
@@ -106,7 +127,7 @@ Modes of transportation. Must be one of the modes returned from /transitmodes, c
           latitude,
           longitude,
           time,
-          maxDuration,
+          duration,
           modes,
           schedule,
           direction)
@@ -117,42 +138,53 @@ Modes of transportation. Must be one of the modes returned from /transitmodes, c
 
     val sptInfo = SptInfoCache.get(request)
 
-    val multiPolygonOps:Seq[Op[MultiPolygon[Int]]] =
+    val resourcesOp:Op[List[Resource]] =
       sptInfo.vertices match {
         case Some(ReachableVertices(subindex, extent)) =>
           val re = RasterExtent(expandByLDelta(extent), cols, rows)
-          val r = TravelTimeRaster(re, re, sptInfo,ldelta)
-          (for(duration <- durations) yield {
-            Literal(r)
-            // Set all relevant times to 1, everything else to NODATA
-              .into(logic.RasterMapIfSet(_)(z => if(z <= duration) { 1 } else { NODATA }))
-            // Vectorize
-              .into(ToVector(_))
-            // Simplify
-              .map { vectors =>
-              vectors.map(geometry.Simplify(_, tolerance))
-            }
-            // Collect the operations
-              .into(logic.Collect(_))
-            // Map the individual Vectors into one MultiPolygon
-              .map { vectors =>
-              val geoms =
-                vectors.map(_.geom.asInstanceOf[jts.Polygon])
+          Literal(TravelTimeRaster(re, re, sptInfo,ldelta))
+          // Set all relevant times to 1, everything else to NODATA
+            .into(logic.RasterMapIfSet(_)(z => if(z <= duration) { 1 } else { NODATA }))
+          // Vectorize
+            .into(ToVector(_).map(_.toSeq))
+          // Map the individual Vectors into one MultiPolygon
+            .map { vectors =>
+            val geoms =
+              vectors.map(_.geom.asInstanceOf[jts.Polygon])
 
-              val multiPolygonGeom =
-                Feature.factory.createMultiPolygon(geoms.toArray)
+            val multiPolygonGeom =
+              Feature.factory.createMultiPolygon(geoms.toArray)
 
-              MultiPolygon(multiPolygonGeom, duration)
-            }
-          }).toSeq
-        case None => Seq(Literal(MultiPolygon.empty(0)))
+            // Get bounding box
+            val env = multiPolygonGeom.getEnvelopeInternal
+            val extent = Extent(env.getMinX,env.getMinY,env.getMaxX,env.getMaxY)
+
+            Main.enterReturn.index.pointsInExtent(extent)
+                                  .filter { resource =>
+                                     if(categories.contains(resource.category)) {
+                                       val p =
+                                         Feature.factory.createPoint(
+                                           new jts.Coordinate(resource.lat,resource.lng)
+                                         )
+                                       multiPolygonGeom.contains(p)
+                                     } else { false }
+                                   }
+                                  .toList
+          }
+        case None => Literal(List[Resource]())
       }
 
-    multiPolygonOps.map( polys =>
+    val jsonOp = 
+      resourcesOp.map { resources =>
+        val jsons = resources.map(_.toJson).mkString(",")
+        s"""
+{
+  "resources" : [ $jsons ]
+}
+"""
+      }
 
-    val geoJsonOp = io.ToGeoJson(multiPolygonOps)
-
-    GeoTrellis.run(geoJsonOp) match {
+    GeoTrellis.run(jsonOp) match {
       case process.Complete(json, h) =>
         OK.json(json)
       case process.Error(message, failure) =>

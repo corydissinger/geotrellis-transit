@@ -23,10 +23,16 @@ object Main {
   private var _context:GraphContext = null
   def context = _context
 
+  // ENTER RETURN
+  private var _enterReturn:EnterReturnData = null
+  def enterReturn = _enterReturn
+
   def initContext(configPath:String) = {
     _context = Configuration.loadPath(configPath).graph.getContext
     println("Initializing shortest path tree array...")
     ShortestPathTree.initSptArray(context.graph.vertexCount)
+    println("Parsing enter return data...")
+    _enterReturn = EnterReturn.readData()
   }
 
   def main(args:Array[String]):Unit = {

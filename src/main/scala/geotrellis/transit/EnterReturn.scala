@@ -6,18 +6,43 @@ import geotrellis.feature._
 
 import scala.collection.mutable
 
-case class Category(root:String,name:String,url:URL)
+case class Category(root:String,name:String,url:URL) {
+  def toJson() = {
+    s"""{ "category" : "$root", "subcategory" : "$name", "url" : "${url.toString}" }"""
+  }
+}
 
 case class Resource(category:Category,
                     name:String,
                     websites:List[String],
                     phones:List[String],
-                    addresses:List[String],
-                    zipCodes:List[String],
+                    address:String,
+                    zipCode:String,
                     emails:List[String],
                     description:String,
                     lat:Double,
-                    lng:Double)
+                    lng:Double) {
+  def toJson() = {
+    val w = websites.map(x => s""""$x"""").mkString(",")
+    val p = phones.map(x => s""""$x"""").mkString(",")
+    val e = emails.map(x => s""""$x"""").mkString(",")
+
+    s"""
+     {
+       "category" : ${category.toJson},
+       "name" : "$name",
+       "websites" : [ $w  ],
+       "phones" : [ $p ],
+       "address" : "$address",
+       "zipCode" : "$zipCode",
+       "emails"  : [ $e ],
+       "description" : "$description",
+       "lat" : $lat,
+       "lng" : $lng
+     }
+    """
+  }
+}
 
 case class EnterReturnData(
   categories:List[Category],
@@ -32,43 +57,21 @@ object EnterReturn {
       }).toList
     }
 
-    val resources = {
-      val rs = mutable.Map[(String,String),Resource]()
-
-      for( entry <- Csv.fromPath("data/networkofcare.csv")) {
-        val name = entry("name")
-        val phones = entry("phones")
-        if(!rs.contains((name,phones))) {
-          rs((name,phones)) =
-            Resource(
-              Category(entry("category"),entry("subcategory"),new URL(entry("subcategory_url"))),
-              entry("name"),
-              entry("websites").split(",").toList,
-              entry("phones").split(",").toList,
-              List(entry("address")),
-              List(entry("zipcode")),
-              entry("emails").split(",").toList,
-              entry("description"),
-              entry("lat").toDouble,
-              entry("lng").toDouble
-            )
-        } else {
-          val r = rs((name,phones))
-          rs((name,phones)) =
-            Resource(r.category,
-                     r.name,
-                     r.websites,
-                     r.phones,
-                     entry("address") :: r.addresses,
-                     entry("zipcode") :: r.zipCodes,
-                     r.emails,
-                     r.description,
-                     r.lat,
-                     r.lng)
-        }
-      }
-      rs.values.toList
-    }
+    val resources =
+      (for( entry <- Csv.fromPath("data/networkofcare.csv")) yield {
+        Resource(
+          Category(entry("category"),entry("subcategory"),new URL(entry("subcategory_url"))),
+          entry("name"),
+          entry("websites").split(",").toList,
+          entry("phones").split(",").toList,
+          entry("address"),
+          entry("zipcode"),
+          entry("emails").split(",").toList,
+          entry("description"),
+          entry("lat").toDouble,
+          entry("lng").toDouble
+        )
+      }).toList
 
     val index = SpatialIndex(resources) { r => (r.lat,r.lng) }
     EnterReturnData(categories,index)
