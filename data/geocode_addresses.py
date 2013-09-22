@@ -27,12 +27,17 @@ if __name__ == '__main__':
 			try:
 				addr = row[address_field].decode("utf-8", "ignore")
 				print addr
+                                s = ""
+                                for c in addr:
+                                        if not (c == u'\xa0' or c == u'\xc2'):
+                                                s += c
+                                addr = s
 				#addr.replace(u'\xc2\xa0', ' ')
 				encoded_addr = urllib2.quote(addr)
 				full_url = base_url + encoded_addr
 				print full_url
 				response = urllib2.urlopen(full_url)
-				#data = json.loads(response.read())
+				data = json.loads(response.read())
 				lng = data['Locations'][0]['XCoord']
 				lat = data['Locations'][0]['YCoord']
 				print_row(row + [lat, lng])
