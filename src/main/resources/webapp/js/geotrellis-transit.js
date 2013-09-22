@@ -5,7 +5,7 @@ var GTT = (function() {
         var INITIAL_TIME = d.getTime() - d.setHours(0,0,0,0);
 
 //        var baseUrl = "http://localhost:9999/api";
-        var baseUrl = baseUrl || "http://transit.geotrellis.com/api";
+        var baseUrl = baseUrl || "http://ec2-50-19-68-65.compute-1.amazonaws.com/api";
 
         var viewCoords = [39.9886950160466,-75.1519775390625];
         var geoCodeLowerLeft = { lat: 39.7353312333975, lng: -75.4468831918069 };
