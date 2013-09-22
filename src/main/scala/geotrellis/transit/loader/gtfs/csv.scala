@@ -59,7 +59,7 @@ class Csv(private val reader:BufferedReader) extends Iterator[Map[String,String]
   }
 
   def parseValues(line:String) = {
-    line.split(',')
+    line.split("""","""")
         .map(unquote(_).trim
                        .replace("\"\"", "\""))
   }
@@ -68,9 +68,14 @@ class Csv(private val reader:BufferedReader) extends Iterator[Map[String,String]
   * If str is surrounded by quotes it return the content between the quotes
   */
   def unquote(str: String) = {
-    if (str != null && str.length >= 2 && str.charAt(0) == '\"' && str.charAt(str.length - 1) == '\"')
+    if (str != null && str.length >= 2 && str.charAt(0) == '\"' && str.charAt(str.length - 1) == '\"') {
       str.substring(1, str.length - 1)
-    else
+    } else if(str.startsWith(""""""")) {
+      str.substring(1,str.length)
+    } else if(str.endsWith(""""""")) {
+      str.substring(0,str.length-1)
+    } else {
       str
+    }
   }
 } 

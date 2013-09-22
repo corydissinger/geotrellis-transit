@@ -58,7 +58,7 @@ object EnterReturn {
     }
 
     val resources =
-      (for( entry <- Csv.fromPath("data/networkofcare.csv")) yield {
+      (for( entry <- Csv.fromPath("data/networkofcare_lat_lng.csv")) yield {
         Resource(
           Category(entry("category"),entry("subcategory"),new URL(entry("subcategory_url"))),
           entry("name"),
