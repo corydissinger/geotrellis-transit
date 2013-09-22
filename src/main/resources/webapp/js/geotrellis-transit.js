@@ -130,6 +130,7 @@ var GTT = (function() {
         var dynamicRendering = false;
         var vector = false;
 		var categories = [];
+		var startAddr = "";
 
         var notifyChange = function() { 
             _.each(listeners, function(f) { f(); });
@@ -237,6 +238,13 @@ var GTT = (function() {
                     return _.reduce(categories, 
                                     function(s,v) { return s + "," + v; });
                 };
+            },
+            setStartAddr: function(newStart) {
+                startAddr = newStart;
+                notifyChange();
+            },
+            getStartAddr: function() { 
+                return startAddr;
             }
         }
     };
