@@ -177,39 +177,37 @@ var APP = (function() {
     })();
 
     var resourceMarkers = (function() {
-        var resources = [];
 
-		var createNewResourceMarker() = (function(resourceData) {
+		var createNewResourceMarker = (function(resourceData) {
 		    var marker = L.marker([resourceData.lat, resourceData.lng], {
 		        draggable: false,
 		        clickable: true  
 		    }).addTo(map);
 
-			popupHtml = generatePopupHtml($("#popup-template").clone(), resourceData);
+			var popupHtml = generatePopupHtml($("#popup-template").clone(), resourceData);
 
 			marker.bindPopup(popupHtml);
-
-		    marker.on('click', function(e) { 
-				openPopup();
-		    });
 		});
 
-		var resetResources() = (function() {
-			resources = [];
-		});
+		var generatePopupHtml = (function(template, resourceData) {
+			var phoneString = _.reduce(resourceData.phones, function(s, v){ return s + "<br/>" + v });
+			var emailsString = _.reduce(resourceData.emails, function(s, v){ return s + "<br/>" + v });
 
-		var generatePopupHtml() = (function(template, resourceData) {
-			var phoneString = _.return(resourceData.phones, function(s, v){ return s + "<br/>" + v });
-			var emailString = _.return(resourceData.emails, function(s, v){ return s + "<br/>" + v });
+			var startReady = requestModel.getStartAddr().replace(" ", "+");
+			var destReady = resourceData.address.replace(" ", "+"); 
+			var hrefString = "https://maps.google.com/maps?saddr=" + startReady + "&daddr=" + destReady;
 
 			template.find("#resource-name").html(resourceData.name);
 			template.find("#resource-emails").html(emailsString);
 			template.find("#resource-phones").html(phoneString);
+			template.find("#resource-address").html(resourceData.address);
+			template.find("#resource-address").attr("href", hrefString);
+
+			return template;
 		});
 
         return {
-            createNewResourceMarker : createNewResourceMarker,
-            resetResources : resetResources
+            createNewResourceMarker : createNewResourceMarker
         };
     })();
 
@@ -233,7 +231,8 @@ var APP = (function() {
                 }
             });
             requestModel.notifyChange();
-        }
+        },
+		resourceMarkers : resourceMarkers
     };
 })();
 
