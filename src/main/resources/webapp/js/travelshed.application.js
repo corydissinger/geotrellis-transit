@@ -92,7 +92,6 @@ var APP = (function() {
 
             if(requestModel.getVector()) {
                 var modes 	   = requestModel.getModesString();
-                var categories = requestModel.getCategoriesString();
 
                 if(modes != "" && categories != "") {
                     var latLng = requestModel.getLatLng();
@@ -102,7 +101,7 @@ var APP = (function() {
                     var schedule = requestModel.getSchedule();
 
                     $.ajax({
-                        url: GTT.Constants.BASE_URL + '/travelshed/json',
+                        url: GTT.Constants.BASE_URL + '/enterreturn/json',
                         dataType: "json",
                         data: { 
                             latitude: latLng.lat,
@@ -110,7 +109,6 @@ var APP = (function() {
                             time: time,
                             durations: duration,
                             modes: modes,
-							categories: categories,
                             schedule: schedule,
                             direction: direction,
 						    cols: 200,
@@ -177,6 +175,7 @@ var APP = (function() {
     })();
 
     var resourceMarkers = (function() {
+		var markers = [];
 
 		var createNewResourceMarker = (function(resourceData) {
 		    var marker = L.marker([resourceData.lat, resourceData.lng], {
@@ -185,8 +184,12 @@ var APP = (function() {
 		    }).addTo(map);
 
 			var popupHtml = generatePopupHtml($("#popup-template").clone(), resourceData);
-
+			markers.push(marker);
 			marker.bindPopup(popupHtml);
+		});
+
+		var removeAllMarkers = (function() {
+			
 		});
 
 		var generatePopupHtml = (function(template, resourceData) {
@@ -203,7 +206,7 @@ var APP = (function() {
 			template.find("#resource-address").html(resourceData.address);
 			template.find("#resource-address").attr("href", hrefString);
 
-			return template;
+			return template.html();
 		});
 
         return {
@@ -235,7 +238,7 @@ var APP = (function() {
 		resourceMarkers : resourceMarkers
     };
 })();
-
+//http://ec2-50-19-68-65.compute-1.amazonaws.com/api/enterreturn/json?latitude=39.950510086014404&longitude=-75.1640796661377&time=52426&durations=3600&modes=walking%2Cbus&schedule=weekday&direction=departing&cols=200&rows=200
 // On page load
 $(document).ready(function() {
     APP.onReady();
