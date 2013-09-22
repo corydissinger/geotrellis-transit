@@ -159,7 +159,9 @@ Modes of transportation. Must be one of the modes returned from /transitmodes, c
             val env = multiPolygonGeom.getEnvelopeInternal
             val extent = Extent(env.getMinX,env.getMinY,env.getMaxX,env.getMaxY)
 
-            Main.enterReturn.index.pointsInExtent(extent)
+            val pie = Main.enterReturn.index.pointsInExtent(extent)
+            println(s"LENGHT OF RESOURCES IS ${pie.length}")
+            pie
                                   .filter { resource =>
                                      if(categories.contains(resource.category)) {
                                        val p =
