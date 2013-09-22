@@ -171,7 +171,7 @@ Modes of transportation. Must be one of the modes returned from /transitmodes, c
                                   .filter { resource =>
               val p =
                 Feature.factory.createPoint(
-                  new jts.Coordinate(resource.lat,resource.lng)
+                  new jts.Coordinate(resource.lng,resource.lat)
                 )
               multiPolygonGeom.contains(p)
                                    }
