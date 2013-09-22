@@ -1,18 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>GeoTrellis Transit</title>
+    <title>ENTER RETURN</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="GeoTrellis features demo.">
     <meta name="author" content="Azavea">
-
+    
     <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-
+    <link href="css/hightlight.default.css" rel="stylesheet" media="screen">
+    <link href='css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
+    <link href="css/application.css" rel="stylesheet" media="screen">
+    <link href='css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
+    
     <script src='js/jquery-1.8.0.min.js' type='text/javascript'></script>
+    <script src='js/jquery.slideto.min.js' type='text/javascript'></script>
+    <script src='js/jquery.wiggle.min.js' type='text/javascript'></script>
+    <script src='js/jquery.ba-bbq.min.js' type='text/javascript'></script>
+    <script src='js/handlebars-1.0.rc.1.js' type='text/javascript'></script>
     <script src='js/underscore.js' type='text/javascript'></script>
-</head>
-<body>
+    <script src='js/backbone-min.js' type='text/javascript'></script>
+    <script src='js/swagger.js' type='text/javascript'></script>
+    <script src='js/swagger-ui.js' type='text/javascript'></script>
+    <script src='js/highlight.7.3.pack.js' type='text/javascript'></script>
 
+    <script type="text/javascript">
+	$(function () {
+	    window.swaggerUi = new SwaggerUi({
+                discoveryUrl:"api/api-docs.json",
+                apiKey:"",
+                dom_id:"swagger-ui-container",
+                supportHeaderParams: false,
+                supportedSubmitMethods: ['get', 'post', 'put'],
+                onComplete: function(swaggerApi, swaggerUi){
+                   if(console) {
+                        console.log("Loaded GeoTrellis Transit API metadata")
+                        console.log(swaggerApi);
+                        console.log(swaggerUi);
+                    }
+                  $('pre code').each(function(i, e) {hljs.highlightBlock(e)});
+                },
+                onFailure: function(data) {
+                    if(console) {
+                        console.log("Unable to Load GeoTrellis Transit API metadata.");
+                        console.log(data);
+                    }
+                },
+                docExpansion: "none"
+            });
+
+            window.swaggerUi.load();
+        });
+
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="file:///Users/mabel/Desktop/CONNECT/webapp/index.html"></a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">      
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="index.html">API</a></li>
+                <li><a href="http:studiocns.org/enterreturn/">About this Prototype</a></li>
+                
+            </ul>
+        </div>
+    </nav>
+    <div id="homepage" class="content">
+        <div class="container">
+            <div class="container-inner">
+                
+                <ul class="list-inline">
+                <li>
+                <form>
+  <fieldset>
+    <legend>LOOKING FOR RESOURCES</legend>
+    <h3>&nbsp;</h3>
+    <span class="help-block">ADD YOUR ADDRESS</span>
+    <input type="text" class="list-inline" placeholder="">
+    
+    
+   <h3>&nbsp;</h3>
+   <span class="help-block">SELECT A TOPIC</span>
+    <label class="checkbox">
+      <input type="checkbox"> 
+      Housing
+    </label>
+      <label class="checkbox">
+        <input type="checkbox">
+        Employment </label>
+      <label class="checkbox">
+        <input type="checkbox">
+        Reentry Programs </label>
+        <p>&nbsp;</p>
+    <button type="submit" class="btn">
+    <p>SEARCH</p>
+    </button>
+  </fieldset>
+</form>
+                </ul>
+                <hr/>
+                
+                
+                <p>Text explaining what is this?</p>
+                
+        </div>
+    </div>
 </body>
 </html>
