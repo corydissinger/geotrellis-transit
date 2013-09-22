@@ -78,8 +78,8 @@ var GTT = (function() {
 
         return {
             addTo : function(m) {
-                defaultLayer.addTo(m);
-                return L.control.layers(baseLayers).addTo(m);                
+                return defaultLayer.addTo(m);
+//                return L.control.layers(baseLayers).addTo(m);                
             }
         };
     })();
@@ -129,8 +129,8 @@ var GTT = (function() {
         var lng = Constants.START_LNG;
         var dynamicRendering = false;
         var vector = false;
-		var categories = [];
-		var startAddr = "";
+	var categories = [];
+	var startAddr = "";
 
         var notifyChange = function() { 
             _.each(listeners, function(f) { f(); });

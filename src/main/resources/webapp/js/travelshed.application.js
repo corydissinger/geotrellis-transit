@@ -1,7 +1,7 @@
 var APP = (function() {
     var map = (function() {
         var m = L.map('map').setView(GTT.Constants.VIEW_COORDS, 12);
-        m.lc = GTT.BaseLayers.addTo(m);
+        GTT.BaseLayers.addTo(m);
 
         $('#map').resize(function() {
             m.setView(m.getBounds(),m.getZoom());
@@ -26,7 +26,7 @@ var APP = (function() {
                 var dynamicRendering = requestModel.getDynamicRendering();
 
                 if (mapLayer) {
-                    map.lc.removeLayer(mapLayer);
+//                    map.lc.removeLayer(mapLayer);
                     map.removeLayer(mapLayer);
                     mapLayer = null;
                 }
@@ -64,7 +64,7 @@ var APP = (function() {
 		
 		mapLayer.setOpacity(opacity);
 		mapLayer.addTo(map);
-		map.lc.addOverlay(mapLayer, "Travel Times");
+//		map.lc.addOverlay(mapLayer, "Travel Times");
             }
         };
 
@@ -81,64 +81,79 @@ var APP = (function() {
     })();
     
     var vectorLayer = (function() {
-        var vectorLayer = null;
+	var markers = [];
+
+	var createNewResourceMarker = (function(resourceData) {
+	    var marker = L.marker([resourceData.lat, resourceData.lng], {
+		draggable: false,
+		clickable: true  
+	    }).addTo(map);
+
+	    var popupHtml = generatePopupHtml($("#popup-template").clone(), resourceData);
+	    markers.push(marker);
+	    marker.bindPopup(popupHtml);
+	});
+
+	var generatePopupHtml = (function(template, resourceData) {
+	    var phoneString = _.reduce(resourceData.phones, function(s, v){ return s + "<br/>" + v });
+	    var emailsString = _.reduce(resourceData.emails, function(s, v){ return s + "<br/>" + v });
+
+	    var startReady = requestModel.getStartAddr().replace(" ", "+");
+	    var destReady = resourceData.address.replace(" ", "+"); 
+	    var hrefString = "https://maps.google.com/maps?saddr=" + startReady + "&daddr=" + destReady;
+
+	    template.find("#resource-name").html(resourceData.name);
+	    template.find("#resource-emails").html(emailsString);
+	    template.find("#resource-phones").html(phoneString);
+	    template.find("#resource-address").html(resourceData.address);
+	    template.find("#resource-address").attr("href", hrefString);
+
+	    return template.html();
+	});
+
 
         var update = function() {
-            if (vectorLayer) {
-                map.lc.removeLayer(vectorLayer);
-                map.removeLayer(vectorLayer);
-                vectorLayer = null; 
+            if (markers) {
+                _.each(markers,function(m) { 
+                    map.removeLayer(m);
+                });
+                markers  = [];
             }
 
-            if(requestModel.getVector()) {
-                var modes 	   = requestModel.getModesString();
+            var modes 	   = requestModel.getModesString();
+            if(modes != "" && categories != "") {
+                var latLng = requestModel.getLatLng();
+                var time = requestModel.getTime();
+                var duration = requestModel.getDuration();
+                var direction = requestModel.getDirection();
+                var schedule = requestModel.getSchedule();
 
-                if(modes != "" && categories != "") {
-                    var latLng = requestModel.getLatLng();
-                    var time = requestModel.getTime();
-                    var duration = requestModel.getDuration();
-                    var direction = requestModel.getDirection();
-                    var schedule = requestModel.getSchedule();
-
-                    $.ajax({
-                        url: GTT.Constants.BASE_URL + '/enterreturn/json',
-                        dataType: "json",
-                        data: { 
-                            latitude: latLng.lat,
-                            longitude: latLng.lng,
-                            time: time,
-                            durations: duration,
-                            modes: modes,
-                            schedule: schedule,
-                            direction: direction,
-						    cols: 200,
-						    rows: 200
-                        },
-                        success: function(data) {
-                            if (vectorLayer) {
-                                map.lc.removeLayer(vectorLayer);
-                                map.removeLayer(vectorLayer);
-                                vectorLayer = null; 
-                            }
-
-                            var geoJsonOptions = {
-                                style: function(feature) {
-                                    return {
-                                        weight: 2,
-                                        color: "#774C4A",
-                                        opacity: 1,
-                                        fillColor: "#9EFAE2",
-                                        fillOpacity: 0.2
-                                    };
-                                }
-                            };
-
-                            vectorLayer = 
-                                L.geoJson(data, geoJsonOptions)
-                                 .addTo(map);
+                $.ajax({
+                    url: GTT.Constants.BASE_URL + '/enterreturn/json',
+                    dataType: "json",
+                    data: { 
+                        latitude: latLng.lat,
+                        longitude: latLng.lng,
+                        time: time,
+                        durations: duration,
+                        modes: modes,
+                        schedule: schedule,
+                        direction: direction,
+			cols: 200,
+			rows: 200                        
+                    },
+                    success: function(data) {
+                        if (markers) {
+                            _.each(markers,function(m) { 
+                                map.removeLayer(m);
+                            });
+                            markers  = [];
                         }
-                    })
-                }
+                        _.each(data.resources,function(r) {
+                            createNewResourceMarker(r);
+                        })
+                   }
+                })
             }
         }
 
@@ -229,13 +244,14 @@ var APP = (function() {
                     var lat = data.results[0].geometry.location.lat();
                     var lng = data.results[0].geometry.location.lng();
                     startMarker.setLatLng(lat,lng);
+                    requestModel.setStartAddr(input.val);
                 } else {
                     alert("Address not found!");
                 }
             });
             requestModel.notifyChange();
         },
-		resourceMarkers : resourceMarkers
+	resourceMarkers : resourceMarkers
     };
 })();
 //http://ec2-50-19-68-65.compute-1.amazonaws.com/api/enterreturn/json?latitude=39.950510086014404&longitude=-75.1640796661377&time=52426&durations=3600&modes=walking%2Cbus&schedule=weekday&direction=departing&cols=200&rows=200
