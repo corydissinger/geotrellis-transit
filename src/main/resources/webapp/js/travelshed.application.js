@@ -135,7 +135,7 @@ var APP = (function() {
                         latitude: latLng.lat,
                         longitude: latLng.lng,
                         time: time,
-                        durations: duration,
+                        duration: duration,
                         modes: modes,
                         schedule: schedule,
                         direction: direction,
