@@ -13,6 +13,8 @@ import geotrellis.rest._
 import geotrellis.feature._
 import geotrellis.feature.op._
 
+import scala.collection.mutable
+
 import com.vividsolutions.jts.{geom => jts}
 
 trait VectorResource extends ServiceUtil{
@@ -162,9 +164,16 @@ Modes of transportation. Must be one of the modes returned from /transitmodes, c
             val pie = Main.enterReturn.index.pointsInExtent(extent)
             println(s"LENGHT OF RESOURCES IS ${pie.length}")
             println(s"LENGHT OF CATEGORIES IS ${categories.length}")
+
             val catps = 
               pie
                                   .filter { resource => categories.contains(resource.category) }
+
+            val m = mutable.Map[String,Resource]()
+            for(r <- catps) {
+              if(!m.contains(r.name)) { m(r.name) = r }
+            }
+
 
             println(s"CATEGORY RESOURCES IS ${catps.length}")
                catps
@@ -176,6 +185,7 @@ Modes of transportation. Must be one of the modes returned from /transitmodes, c
               //    geoms.foldLeft(false)(_ || _.intersects(p))
               //                      }
                                   .toList
+            m.values.toList
           }
         case None => 
           println("UNREACHABLE!")

@@ -166,8 +166,14 @@ var APP = (function() {
         var lat = GTT.Constants.START_LAT;
         var lng = GTT.Constants.START_LNG;
 
+        var redMarker = L.AwesomeMarkers.icon({
+            color: 'red'
+        });
+
+
         var marker = L.marker([lat,lng], {
-            draggable: true 
+            draggable: true ,
+            icon: redMarker
         }).addTo(map);
         
         marker.on('dragend', function(e) { 
