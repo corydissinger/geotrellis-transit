@@ -163,18 +163,18 @@ Modes of transportation. Must be one of the modes returned from /transitmodes, c
             println(s"LENGHT OF RESOURCES IS ${pie.length}")
             println(s"LENGHT OF CATEGORIES IS ${categories.length}")
             val catps = 
-            pie
+              pie
                                   .filter { resource => categories.contains(resource.category) }
 
             println(s"CATEGORY RESOURCES IS ${catps.length}")
-            catps
-                                  .filter { resource =>
-              val p =
-                Feature.factory.createPoint(
-                  new jts.Coordinate(resource.lat,resource.lng)
-                )
-              multiPolygonGeom.contains(p)
-                                   }
+               catps
+              //                     .filter { resource =>
+              // val p =
+              //   Feature.factory.createPoint(
+              //     new jts.Coordinate(resource.lng,resource.lat)
+              //   )
+              //    geoms.foldLeft(false)(_ || _.intersects(p))
+              //                      }
                                   .toList
           }
         case None => 
@@ -194,7 +194,7 @@ Modes of transportation. Must be one of the modes returned from /transitmodes, c
 
     GeoTrellis.run(jsonOp) match {
       case process.Complete(json, h) =>
-        OK.json(json)
+        OK.json(json).allowCORS
       case process.Error(message, failure) =>
         ERROR(message, failure)
     }

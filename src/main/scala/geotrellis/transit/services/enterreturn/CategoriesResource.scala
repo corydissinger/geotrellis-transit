@@ -47,6 +47,6 @@ class TransitModesService extends ServiceUtil {
         "categories": [ $categories ]
        }
      """
-    OK.json(json)
+    OK.json(json).allowCORS
   }
 }
