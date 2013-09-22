@@ -163,17 +163,17 @@ Modes of transportation. Must be one of the modes returned from /transitmodes, c
             println(s"LENGHT OF RESOURCES IS ${pie.length}")
             println(s"LENGHT OF CATEGORIES IS ${categories.length}")
             val catps = 
-            pie
+              pie
                                   .filter { resource => categories.contains(resource.category) }
 
             println(s"CATEGORY RESOURCES IS ${catps.length}")
-            catps
+               catps
                                   .filter { resource =>
               val p =
                 Feature.factory.createPoint(
                   new jts.Coordinate(resource.lng,resource.lat)
                 )
-              multiPolygonGeom.contains(p)
+              multiPolygonGeom.intersects(p)
                                    }
                                   .toList
           }
