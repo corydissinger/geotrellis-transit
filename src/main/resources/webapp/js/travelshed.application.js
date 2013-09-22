@@ -121,7 +121,7 @@ var APP = (function() {
             }
 
             var modes 	   = requestModel.getModesString();
-            if(modes != "" /*&& categories != ""*/) {
+            if(modes != "" ) {
                 var latLng = requestModel.getLatLng();
                 var time = requestModel.getTime();
                 var duration = requestModel.getDuration();
