@@ -168,13 +168,13 @@ Modes of transportation. Must be one of the modes returned from /transitmodes, c
 
             println(s"CATEGORY RESOURCES IS ${catps.length}")
                catps
-                                  .filter { resource =>
-              val p =
-                Feature.factory.createPoint(
-                  new jts.Coordinate(resource.lng,resource.lat)
-                )
-                 geoms.foldLeft(false)(_ || _.intersects(p))
-                                   }
+              //                     .filter { resource =>
+              // val p =
+              //   Feature.factory.createPoint(
+              //     new jts.Coordinate(resource.lng,resource.lat)
+              //   )
+              //    geoms.foldLeft(false)(_ || _.intersects(p))
+              //                      }
                                   .toList
           }
         case None => 
