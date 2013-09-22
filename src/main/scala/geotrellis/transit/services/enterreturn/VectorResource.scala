@@ -158,20 +158,28 @@ Modes of transportation. Must be one of the modes returned from /transitmodes, c
             // Get bounding box
             val env = multiPolygonGeom.getEnvelopeInternal
             val extent = Extent(env.getMinX,env.getMinY,env.getMaxX,env.getMaxY)
+            println(s"EXTENT: $extent")
+            val pie = Main.enterReturn.index.pointsInExtent(extent)
+            println(s"LENGHT OF RESOURCES IS ${pie.length}")
+            println(s"LENGHT OF CATEGORIES IS ${categories.length}")
+            val catps = 
+            pie
+                                  .filter { resource => categories.contains(resource.category) }
 
-            Main.enterReturn.index.pointsInExtent(extent)
+            println(s"CATEGORY RESOURCES IS ${catps.length}")
+            catps
                                   .filter { resource =>
-                                     if(categories.contains(resource.category)) {
-                                       val p =
-                                         Feature.factory.createPoint(
-                                           new jts.Coordinate(resource.lat,resource.lng)
-                                         )
-                                       multiPolygonGeom.contains(p)
-                                     } else { false }
+              val p =
+                Feature.factory.createPoint(
+                  new jts.Coordinate(resource.lat,resource.lng)
+                )
+              multiPolygonGeom.contains(p)
                                    }
                                   .toList
           }
-        case None => Literal(List[Resource]())
+        case None => 
+          println("UNREACHABLE!")
+          Literal(List[Resource]())
       }
 
     val jsonOp = 
