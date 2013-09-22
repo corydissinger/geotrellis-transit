@@ -23,17 +23,20 @@ case class Resource(category:Category,
                     lat:Double,
                     lng:Double) {
   def toJson() = {
-    val w = websites.map(x => s""""$x"""").mkString(",")
-    val p = phones.map(x => s""""$x"""").mkString(",")
-    val e = emails.map(x => s""""$x"""").mkString(",")
+    val w = websites.map(_.replace(""""""","'")).map(x => s""""$x"""").mkString(",")
+    val p = phones.map(_.replace(""""""","'")).map(x => s""""$x"""").mkString(",")
+    val e = emails.map(_.replace(""""""","'")).map(x => s""""$x"""").mkString(",")
+
+    val n = name.replace(""""""","'")
+    val a = address.replace(""""""","'")
 
     s"""
      {
        "category" : ${category.toJson},
-       "name" : "$name",
+       "name" : "$n",
        "websites" : [ $w  ],
        "phones" : [ $p ],
-       "address" : "$address",
+       "address" : "$a",
        "zipCode" : "$zipCode",
        "emails"  : [ $e ],
        "lat" : $lat,
