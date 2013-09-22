@@ -194,7 +194,7 @@ Modes of transportation. Must be one of the modes returned from /transitmodes, c
 
     GeoTrellis.run(jsonOp) match {
       case process.Complete(json, h) =>
-        OK.json(json)
+        OK.json(json).allowCORS
       case process.Error(message, failure) =>
         ERROR(message, failure)
     }
