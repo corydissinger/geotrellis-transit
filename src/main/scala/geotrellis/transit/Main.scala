@@ -28,11 +28,12 @@ object Main {
   def enterReturn = _enterReturn
 
   def initContext(configPath:String) = {
+    println("Parsing enter return data...")
+    _enterReturn = EnterReturn.readData()
+    println("Getting graph data...")
     _context = Configuration.loadPath(configPath).graph.getContext
     println("Initializing shortest path tree array...")
     ShortestPathTree.initSptArray(context.graph.vertexCount)
-    println("Parsing enter return data...")
-    _enterReturn = EnterReturn.readData()
   }
 
   def main(args:Array[String]):Unit = {
