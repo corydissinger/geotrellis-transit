@@ -37,8 +37,8 @@ if __name__ == '__main__':
 
 				response = urllib2.urlopen(full_url)
 				data = json.loads(response.read())
-				lng = data['Locations'][0]['XCoord']
-				lat = data['Locations'][0]['YCoord']
+				lng = str(data['Locations'][0]['XCoord'])
+				lat = str(data['Locations'][0]['YCoord'])
 				print_row(row + [lat, lng])
 
 			except Exception, e:

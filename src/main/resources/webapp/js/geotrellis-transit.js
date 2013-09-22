@@ -129,6 +129,7 @@ var GTT = (function() {
         var lng = Constants.START_LNG;
         var dynamicRendering = false;
         var vector = false;
+		var categories = [];
 
         var notifyChange = function() { 
             _.each(listeners, function(f) { f(); });
@@ -213,6 +214,29 @@ var GTT = (function() {
             },
             getVector: function() { 
                 return vector;
+            },
+            addCategory: function(category) {
+                if(!_.contains(categories,category)) {
+                    categories.push(category);
+                    notifyChange();
+                };
+            },
+            removeCategory: function(category) {
+                if(_.contains(categories,category)) {
+                    var i = categories.indexOf(category);
+                    categories.splice(i,1);
+                    notifyChange();
+                };
+            },
+            getCategories: function() {
+                return categories;
+            },
+            getCategoriesString : function() {
+                if(categories.length == 0) { return ""; }
+                else {
+                    return _.reduce(categories, 
+                                    function(s,v) { return s + "," + v; });
+                };
             }
         }
     };

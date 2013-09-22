@@ -1,0 +1,28 @@
+{
+	resources : [
+		{ name: "yada",
+          address: "1400 Lombard St",
+          zipCode: "19222",
+          emails : [ 'test@test.com', 'test@test.com'],
+          phones : [ "243","@3432"],
+      	}, 
+		{ name: "test2",
+          address: "1450 Lombard St",
+          zipCode: "19222",
+          emails : [ 'test@test.com', 'test@test.com'],
+          phones : [ "243","@3432"],
+      	}, 
+		{ name: "test3",
+          address: "1400 Lombard St",
+          zipCode: "19222",
+          emails : [ 'test@test.com', 'test@test.com'],
+          phones : [ "243","@3432"],
+      	}, 
+		{ name: "test3",
+          address: "100 Market St",
+          zipCode: "19222",
+          emails : [ 'test@test.com', 'test@test.com'],
+          phones : [ "243","@3432"],
+      	}, 
+	]
+}

@@ -91,8 +91,10 @@ var APP = (function() {
             }
 
             if(requestModel.getVector()) {
-                var modes = requestModel.getModesString();
-                if(modes != "") {
+                var modes 	   = requestModel.getModesString();
+                var categories = requestModel.getCategoriesString();
+
+                if(modes != "" && categories != "") {
                     var latLng = requestModel.getLatLng();
                     var time = requestModel.getTime();
                     var duration = requestModel.getDuration();
@@ -108,10 +110,11 @@ var APP = (function() {
                             time: time,
                             durations: duration,
                             modes: modes,
+							categories: categories,
                             schedule: schedule,
                             direction: direction,
-			    cols: 200,
-			    rows: 200
+						    cols: 200,
+						    rows: 200
                         },
                         success: function(data) {
                             if (vectorLayer) {
@@ -171,6 +174,43 @@ var APP = (function() {
                 requestModel.setLatLng(lat,lng);
             }
         }
+    })();
+
+    var resourceMarkers = (function() {
+        var resources = [];
+
+		var createNewResourceMarker() = (function(resourceData) {
+		    var marker = L.marker([resourceData.lat, resourceData.lng], {
+		        draggable: false,
+		        clickable: true  
+		    }).addTo(map);
+
+			popupHtml = generatePopupHtml($("#popup-template").clone(), resourceData);
+
+			marker.bindPopup(popupHtml);
+
+		    marker.on('click', function(e) { 
+				openPopup();
+		    });
+		});
+
+		var resetResources() = (function() {
+			resources = [];
+		});
+
+		var generatePopupHtml() = (function(template, resourceData) {
+			var phoneString = _.return(resourceData.phones, function(s, v){ return s + "<br/>" + v });
+			var emailString = _.return(resourceData.emails, function(s, v){ return s + "<br/>" + v });
+
+			template.find("#resource-name").html(resourceData.name);
+			template.find("#resource-emails").html(emailsString);
+			template.find("#resource-phones").html(phoneString);
+		});
+
+        return {
+            createNewResourceMarker : createNewResourceMarker,
+            resetResources : resetResources
+        };
     })();
 
     return {
