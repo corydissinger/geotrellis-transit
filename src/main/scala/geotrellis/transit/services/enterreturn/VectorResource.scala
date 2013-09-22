@@ -173,7 +173,7 @@ Modes of transportation. Must be one of the modes returned from /transitmodes, c
                 Feature.factory.createPoint(
                   new jts.Coordinate(resource.lng,resource.lat)
                 )
-              multiPolygonGeom.intersects(p)
+                 geoms.foldLeft(false)(_ || _.intersects(p))
                                    }
                                   .toList
           }
