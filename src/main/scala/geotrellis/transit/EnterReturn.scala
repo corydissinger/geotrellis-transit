@@ -23,12 +23,12 @@ case class Resource(category:Category,
                     lat:Double,
                     lng:Double) {
   def toJson() = {
-    val w = websites.map(_.replace(""""""","'").replace("\xe2\x80\x99","")).map(x => s""""$x"""").mkString(",")
-    val p = phones.map(_.replace(""""""","'").replace("\xe2\x80\x99","")).map(x => s""""$x"""").mkString(",")
-    val e = emails.map(_.replace(""""""","'").replace("\xe2\x80\x99","")).map(x => s""""$x"""").mkString(",")
+    val w = websites.map(_.replace(""""""","'").replace("""\xe2\x80\x99""","")).map(x => s""""$x"""").mkString(",")
+    val p = phones.map(_.replace(""""""","'").replace("""\xe2\x80\x99""","")).map(x => s""""$x"""").mkString(",")
+    val e = emails.map(_.replace(""""""","'").replace("""\xe2\x80\x99""","")).map(x => s""""$x"""").mkString(",")
 
-    val n = name.replace(""""""","'").replace("\xe2\x80\x99","")
-    val a = address.replace(""""""","'").replace("\xe2\x80\x99","")
+    val n = name.replace(""""""","'").replace("""\xe2\x80\x99""","")
+    val a = address.replace(""""""","'").replace("""\xe2\x80\x99""","")
 
     s"""
      {
